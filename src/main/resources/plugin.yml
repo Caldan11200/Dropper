@@ -1,0 +1,6 @@
+name: Dropper
+version: ${project.version}
+main: com.banyulescouts.dropper.Dropper
+api-version: 1.17
+authors: [ Caldan112 ]
+description: Dropper plugin
