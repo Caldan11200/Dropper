@@ -62,7 +62,9 @@ public class DropperListener implements Listener {
         if (!block.getType().equals(Material.PLAYER_HEAD)) return;
 
         //if clicked on player head - complete level
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1F, 1F);
         ArenaManager.completedLevel(ArenaManager.getCurrentArena(player), player);
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1F, 1F);
     }
 
     @EventHandler
