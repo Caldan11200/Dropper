@@ -1,10 +1,7 @@
 package com.banyulescouts.dropper;
 
 import me.tigerhix.lib.scoreboard.type.Scoreboard;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.type.WallSign;
@@ -38,8 +35,12 @@ public class DropperListener implements Listener {
         if (!event.getCause().equals(EntityDamageEvent.DamageCause.FALL)) return;
 
         //teleport player back to top of current level if hasn't reached the water yet
-        if (!ArenaManager.isSafe(player, ArenaManager.getCurrentArena(player))) player.teleport(ArenaManager.getCurrentLevel(ArenaManager.getCurrentArena(player), player).getStart());
-        Bukkit.getLogger().info("Respawning on level: "+ArenaManager.getCurrentLevel(ArenaManager.getCurrentArena(player), player).getNumber());
+        if (!ArenaManager.isSafe(player, ArenaManager.getCurrentArena(player))) {
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_VILLAGER_HURT, 1F, 1F);
+            player.teleport(ArenaManager.getCurrentLevel(ArenaManager.getCurrentArena(player), player).getStart());
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_VILLAGER_HURT, 1F, 1F);
+        }
+
 
         //add attempt to player's current run
         ArenaManager.addAttempt(ArenaManager.getCurrentArena(player), player);
