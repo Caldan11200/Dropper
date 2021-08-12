@@ -97,6 +97,10 @@ public final class Dropper extends JavaPlugin {
                         if (!joined) player.sendMessage(ChatColor.RED+"This arena is not finished yet");
                     }
                     else if (args[0].equalsIgnoreCase("addjoinsign")) {
+                        if (!player.hasPermission("dropper.setup")) {
+                            player.sendMessage(ChatColor.RED+"You do not have permission to perform this command");
+                            return true;
+                        }
                         Block block = player.getTargetBlock(null, 20);
                         if (block == null) {
                             player.sendMessage(ChatColor.RED+"You are not looking at a block");
