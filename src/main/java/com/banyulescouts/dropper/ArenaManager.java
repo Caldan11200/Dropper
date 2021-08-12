@@ -103,10 +103,10 @@ public class ArenaManager {
         totalTime.get(player).remove(getCurrentArena(player));
         setSafe(player, false);
         saveRuns(player);
-        updateJoinSigns();
         player.sendMessage(ChatColor.WHITE+"Well done! You completed the "+ChatColor.AQUA+getCurrentArena(player).getName()+ChatColor.WHITE+" dropper in "+time+ChatColor.WHITE+"!");
         player.getInventory().clear();
         players.remove(player);
+        updateJoinSigns();
         player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
         player.teleport(lobby);
     }
