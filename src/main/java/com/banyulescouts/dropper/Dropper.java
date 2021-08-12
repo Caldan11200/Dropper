@@ -3,12 +3,18 @@ package com.banyulescouts.dropper;
 import me.tigerhix.lib.scoreboard.ScoreboardLib;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
+import org.bukkit.block.data.type.Wall;
+import org.bukkit.block.data.type.WallSign;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public final class Dropper extends JavaPlugin {
@@ -29,6 +35,7 @@ public final class Dropper extends JavaPlugin {
         data = new DataManager();
         ArenaManager.loadArenas();
         ArenaManager.loadPlayers();
+        ArenaManager.loadSigns();
 
         //add listener
         Bukkit.getPluginManager().registerEvents(new DropperListener(), this);
@@ -40,6 +47,7 @@ public final class Dropper extends JavaPlugin {
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (ArenaManager.isPlaying(player)) ArenaManager.quitRun(player);
         }
+        ArenaManager.saveSigns();
     }
 
     public static Dropper getPlugin() {
@@ -90,6 +98,25 @@ public final class Dropper extends JavaPlugin {
                     else if (args[0].equalsIgnoreCase("join")) {
                         Boolean joined = ArenaManager.startRun(ArenaManager.getArena(args[1]), player);
                         if (!joined) player.sendMessage(ChatColor.RED+"This arena is not finished yet");
+                    }
+                    else if (args[0].equalsIgnoreCase("addjoinsign")) {
+                        Block block = player.getTargetBlock(null, 20);
+                        if (block == null) {
+                            player.sendMessage(ChatColor.RED+"You are not looking at a block");
+                            return true;
+                        }
+                        if (block.getState() instanceof Sign) {
+                            Location loc = block.getLocation();
+                            ArenaManager.joinSigns.put(loc, ArenaManager.getArena(args[1]));
+                            ArenaManager.updateJoinSigns();
+                            ArenaManager.saveSigns();
+                            player.sendMessage(ChatColor.WHITE+"Join sign successfully added");
+                            return true;
+                        }
+                        else {
+                            player.sendMessage(ChatColor.RED+"You are not looking at a sign");
+                            return true;
+                        }
                     }
                 }
             }

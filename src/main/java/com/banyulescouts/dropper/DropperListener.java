@@ -2,9 +2,12 @@ package com.banyulescouts.dropper;
 
 import me.tigerhix.lib.scoreboard.type.Scoreboard;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
+import org.bukkit.block.data.type.WallSign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -139,6 +142,7 @@ public class DropperListener implements Listener {
             ArenaManager.players.remove(player);
             player.teleport(ArenaManager.lobby);
         }
+        ArenaManager.updateJoinSigns();
     }
 
     @EventHandler
@@ -162,5 +166,21 @@ public class DropperListener implements Listener {
     @EventHandler
     public void onKick(PlayerKickEvent event) {
         if (ArenaManager.isPlaying(event.getPlayer())) ArenaManager.quitRun(event.getPlayer());
+    }
+
+    @EventHandler
+    public void signClick(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+        if (!player.getWorld().getName().equalsIgnoreCase("hub")) return;
+        if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return;
+        Block block = event.getClickedBlock();
+        if (block == null) return;
+        if (!(block.getState() instanceof WallSign) && !(block.getState() instanceof Sign)) return;
+        Arena arena = ArenaManager.isJoinSign(block.getLocation());
+        if (arena == null) return;
+        else {
+            Boolean joined = ArenaManager.startRun(arena, player);
+            if (!joined) player.sendMessage(ChatColor.RED+"This arena is not finished yet");
+        }
     }
 }

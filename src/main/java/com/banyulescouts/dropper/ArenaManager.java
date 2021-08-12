@@ -6,6 +6,8 @@ import me.tigerhix.lib.scoreboard.type.Entry;
 import me.tigerhix.lib.scoreboard.type.Scoreboard;
 import me.tigerhix.lib.scoreboard.type.ScoreboardHandler;
 import org.bukkit.*;
+import org.bukkit.block.Sign;
+import org.bukkit.block.data.type.WallSign;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -23,6 +25,7 @@ public class ArenaManager {
     public static HashMap<Player, HashMap<Arena, Long>> currentTimes = new HashMap<>();
 
     public static HashMap<Player, Scoreboard> scoreboards = new HashMap<>();
+    public static HashMap<Location, Arena> joinSigns = new HashMap<>();
 
     public static HashMap<Player, HashMap<Arena, Level>> currentLevels = new HashMap<>();
     public static HashMap<Player, HashMap<Arena, Integer>> currentAttempts = new HashMap<>();
@@ -74,6 +77,8 @@ public class ArenaManager {
         inv.setItem(4, restart);
         inv.setItem(8, leave);
 
+        updateJoinSigns();
+
         startTime(player, arena);
         return true;
     }
@@ -85,6 +90,7 @@ public class ArenaManager {
         saveRuns(player);
         player.getInventory().clear();
         players.remove(player);
+        updateJoinSigns();
         player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
         player.teleport(lobby);
     }
@@ -98,6 +104,7 @@ public class ArenaManager {
         totalTime.get(player).remove(getCurrentArena(player));
         setSafe(player, false);
         saveRuns(player);
+        updateJoinSigns();
         player.sendMessage(ChatColor.WHITE+"Well done! You completed the "+ChatColor.AQUA+getCurrentArena(player).getName()+ChatColor.WHITE+" dropper in "+time+ChatColor.WHITE+"!");
         player.getInventory().clear();
         players.remove(player);
@@ -241,6 +248,7 @@ public class ArenaManager {
             setSafe(player, false);
             updateCurrentTimes(player, arena);
             saveRuns(player);
+            updateJoinSigns();
         }
     }
 
@@ -327,6 +335,22 @@ public class ArenaManager {
         Dropper.data.saveConfig();
     }
 
+    public static void saveSigns() {
+        for (Map.Entry<Location, Arena> join : joinSigns.entrySet()) {
+            Dropper.data.getConfig().set("signs.join."+join.getValue().getName(),join.getKey());
+        }
+    }
+
+    public static void loadSigns() {
+        if (Dropper.data.getConfig().getConfigurationSection("signs.join") == null) return;
+        Dropper.data.getConfig().getConfigurationSection("signs.join").getKeys(false).forEach(arena -> {
+            if (arena != null) {
+                Location loc = (Location) Dropper.data.getConfig().get("signs.join."+arena);
+                joinSigns.put(loc, getArena(arena));
+            }
+        });
+    }
+
     public static void loadArenas() {
         if (Dropper.data.getConfig().getConfigurationSection("arenas") == null) return;
         Dropper.data.getConfig().getConfigurationSection("arenas").getKeys(false).forEach(key -> {
@@ -397,5 +421,30 @@ public class ArenaManager {
             }
 
         }).setUpdateInterval(20L);
+    }
+
+    public static int playersInArena(Arena arena) {
+        int result = 0;
+        for (Map.Entry<Player, Arena> set : players.entrySet()) {
+            if (set.getValue().equals(arena)) result++;
+        }
+        return result;
+    }
+
+    public static void updateJoinSigns() {
+        for (Map.Entry<Location, Arena> set : joinSigns.entrySet()) {
+            Location loc = set.getKey();
+            Arena arena = set.getValue();
+            if (!(loc.getBlock().getState() instanceof Sign sign)) continue;
+            sign.setLine(0, ChatColor.DARK_AQUA+"[Dropper]");
+            sign.setLine(1, ChatColor.AQUA+arena.getName());
+            sign.setLine(2, ChatColor.WHITE+"Click to join");
+            sign.setLine(3, ChatColor.YELLOW+""+playersInArena(arena)+ChatColor.GOLD+" players");
+            sign.update();
+        }
+    }
+
+    public static Arena isJoinSign(Location location) {
+        return joinSigns.getOrDefault(location, null);
     }
 }
