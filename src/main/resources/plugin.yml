@@ -4,3 +4,8 @@ main: com.banyulescouts.dropper.Dropper
 api-version: 1.17
 authors: [ Caldan112 ]
 description: Dropper plugin
+depend: [Multiverse-Core]
+
+commands:
+  dropper:
+    description: main plugin command
