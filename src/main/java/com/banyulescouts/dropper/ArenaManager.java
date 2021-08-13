@@ -11,6 +11,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashMap;
 import java.util.List;
@@ -75,6 +77,7 @@ public class ArenaManager {
         inv.setItem(0, spectate);
         inv.setItem(4, restart);
         inv.setItem(8, leave);
+        player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 1728000, 1, false, false, false));
 
         updateJoinSigns();
 
@@ -91,6 +94,7 @@ public class ArenaManager {
         players.remove(player);
         updateJoinSigns();
         player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+        player.removePotionEffect(PotionEffectType.NIGHT_VISION);
         player.teleport(lobby);
     }
 
@@ -108,6 +112,7 @@ public class ArenaManager {
         players.remove(player);
         updateJoinSigns();
         player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+        player.removePotionEffect(PotionEffectType.NIGHT_VISION);
         player.teleport(lobby);
     }
 
