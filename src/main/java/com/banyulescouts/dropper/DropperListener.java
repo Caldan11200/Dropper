@@ -158,8 +158,10 @@ public class DropperListener implements Listener {
     public void enterDropperWorld(PlayerChangedWorldEvent event) {
         Player player = event.getPlayer();
 
-        if (event.getPlayer().getWorld().getName().equalsIgnoreCase("dropper")) {
-            if (!ArenaManager.scoreboards.containsKey(player)) ArenaManager.createScoreboard(player);
+        if (player.getWorld().getName().equalsIgnoreCase("dropper")) {
+            if (!ArenaManager.isPlaying(player)) return;
+            if (!ArenaManager.scoreboards.containsKey(player)) ArenaManager.scoreboards.put(player, ArenaManager.createScoreboard(player));
+            else ArenaManager.scoreboards.replace(player, ArenaManager.createScoreboard(player));
             ArenaManager.scoreboards.get(player).activate();
         }
         else {
